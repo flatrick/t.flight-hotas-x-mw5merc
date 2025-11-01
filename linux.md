@@ -50,6 +50,7 @@ Paste in the SDL2 string from Step 3.
 
 Important! replace the folder destinations with the ones on your system if they are different!
 
+```sh
 export W="~/.steam/steam/steamapps/'Proton - Experimental'/dist"
 export WINEVERPATH=$W
 export WINESERVER=$W/bin/wineserver
@@ -57,75 +58,79 @@ export WINELOADER=$W/bin/wine
 export WINEDLLPATH=$W/lib/wine/fakedlls
 export LD_LIBRARY_PATH="$W/lib:$LD_LIBRARY_PATH"
 export WINEPREFIX=~/.steam/steam/steamapps/compatdata/784080/pfx
+```
 
 **Step 7*w: Configure the WINE registry. After entering the Step 6 commands, open regedit using the following command:
 
-```
+```sh
 wine regedit
 ```
 
 Navigate to the following folder:
-```
+```sh
 HKEY_LOCAL_MACHINE > System > CurrentControlSet > Services > winebus
 ```
 
-Right-click on the field of registry entries and select "New" > "DWORD Value".
+Right-click on the field of registry entries and select `New > DWORD Value`
 
-Add a "DWORD Value" and name it "DisableHidraw". Double click the "DisableHidraw" line and set the value data to "1".
+Add a `DWORD Value` and name it `DisableHidraw`.
+Double click the `DisableHidraw` line and set the value data to `1`.
 
 Add the following additional entries:
 
-"DisableInput" with value "1"
+- `DisableInput` with value `1`
+- `Enable SDL` with value `1`
+- `Map Controllers` with a value `1`
 
-"Enable SDL" with value "1"
+And for good measure, we'll add the SDL mapping string here too, but it never seems to work for me (which is why I have to inject it with _Lutris_).
 
-"Map Controllers" with a value "1"
-
-And for good measure, we'll add the SDL mapping string here too, but it never seems to work for me (which is why I have to inject it with Lutirs).
-Right-click > New > String Value. Name it "Map" or anything.
-For Value Data, paste in the SDL string.
+`Right-click > New > String Value`
+Name it "Map" or anything.
+For `Value Data`, paste in the SDL string.
 
 Not all of these may be necessary, but it's what I had these set to when I got things working.
 You're safe to just close out of the registry window, it gets saved as you make entries.
 
 For good measure, go ahead and run the following in the terminal window (you still have that open, right??):
-```
+
+```sh
 wineboot
 ```
 
 **Step 8**: Configure the controller input layers in WINE.
 In the same terminal window as Step 6 and Step 7, go ahead and run the following command:
-```
+
+```sh
 wine control
 ```
 
-Open "Game Controllers".
+Open `Game Controllers`.
 
-Open the XInput tab and make sure that at least your left joystick is registering all inputs correctly.
+Open the `XInput` tab and make sure that at least your left joystick is registering all inputs correctly.
 If it's not, you've got bigger issues going on than the scope of this guide.
 
-Back to the "Joysticks" tab.
+Back to the `Joysticks` tab.
 You are going to split up your joysticks.
-Your left joystick should remain in the "Connected (xinput device)" category.
-For your right joystick, select it and click "Override" so that it is in the top "Connected" category, and not the center "Connected (xinput device)" category.
+Your left joystick should remain in the `Connected (xinput device)` category.
+For your right joystick, select it and click `Override` so that it is in the top `Connected` category, and **not the center `Connected (xinput device)` category**.
 
-Click "Ok" to save your changes.
+Click `Ok` to save your changes.
 
 You can also close that terminal window now.
 
-**Step 9**: Adjust the ingame joystick settings and validate that axial inputs are behaving as expected.
-Make sure AntiMicroX is running with the setup from **Step 2**.
-Run MW5 from Lutris, not the Steam application.
+**Step 9**: Adjust the in-game joystick settings and validate that axial inputs are behaving as expected.
+Make sure _AntiMicroX_ is running with the setup from **Step 2**.
+Run _Mechwarrior 5_ from _Lutris_, not the _Steam_ application.
 
-Go to Settings > Controls > Joystick.
+Go to `Settings > Controls > Joystick`.
 This may take some experimentation, but go ahead and set all of the axis options to Throttle (or Joystick), whichever one is dead to the game with no registered input.
 I personally set all axis settings to "Throttle Axis 1" as nothing appears to be inputting to this axis, but you may need to set it differently to avoid spurious input.
 
 Now go ahead and get yourself into the cockpit of a mech.
-The fastest way for me is Single Player > Instant Action.
+The fastest way for me is **Single Player > Instant Action**.
 
 Once you're in your mech, go ahead and verify that moving your right control stick around pushes around the targeting reticle.
-If you need to invert an axis, go back to AntiMicroX, open the axis that needs inversion, go to cursor settings, and change your preset to "Mouse Horizontal (inverted)" or whatever.
+If you need to invert an axis, go back to AntiMicroX, open the axis that needs inversion, go to cursor settings, and change your preset to `Mouse Horizontal (inverted)` or whatever.
 It won't change any of the other sensitivity/deadzone settings, those will stay yay.
 
 Then verify that the left stick has your forward-back thrust on the front-to-back axis, and turns your torso left and right on the side-to-side axis.
@@ -141,13 +146,14 @@ You're done! You can use your two joysticks to pilot your mech on Linux!
 ## Why was all of this necessary?
 
 _MechWarrior 5_ has very poor joystick support natively on Windows.
-The joystick support is so painfully bad and just not broadly present in a general sense on Windows that trying make the generally poor joystick support in Linux gaming work with the poor MW5 Windows joystick support is like trying to thread a needle in a fucking hurricane while you're on fire.
-I tried a lot of less absurd ways to do this, and was ultimately sabotaged by how under-developed the built-in joystick support is on MW5.
-You can setup the "HOTASMappings.Remap" file to work in Linux by plugging your joysticks into a Windows computer, collecting the Vendor and Product ID strings from the Device Manager there, and then putting that into the HOTASMappings.Remap file on your linux machine and it will recognize the joysticks if they are in DInput layer.
-You can even figure out the offset value that's necessary to get at the midpoint of the axis.
-But the graduated axial input doesn't work, I just get full left authority when the joystick touches the left side of the axis, and then if I touch the right side of the axis I get full right authority until I go back to the left side.
-I play tons of 'Windows' space games on Linux and never had this kind of issue.
 
-I actually wrote a really impassioned email to Piranha's MW5 tech support email contact about the bad HOTAS support basically ruining my life and being absurd for a game where mechs are literally being piloted using HOTAS inside the game, back when I couldn't get dinput to work before I figured out my current solution.
-GM Zen was very gracious with me, and said that "expanded HOTAS support is a frequently requested feature" and that he always forwards feedback about it to the overall MW5 team. 
-Here's to hoping Piranha shows us some stepped up HOTAS support in future releases!
+The joystick support is so painfully bad and just not broadly present in a general sense on Windows that trying make the generally poor joystick support in Linux gaming work with the poor MW5 Windows joystick support is like trying to thread a needle in a fucking hurricane while you're on fire.
+
+I tried a lot of less absurd ways to do this, and was ultimately sabotaged by how under-developed the built-in joystick support is on MW5.
+
+You can setup the `HOTASMappings.Remap` file to work in Linux by plugging your joysticks into a Windows computer, collecting the **Vendor** and **Product ID** strings from the **Device Manager** there, and then putting that into the `HOTASMappings.Remap` file on your Linux machine and it will recognize the joysticks if they are in `DInput` layer.
+
+You can even figure out the offset value that's necessary to get at the midpoint of the axis.
+
+**But the graduated axial input doesn't work**, I just get full left authority when the joystick touches the left side of the axis, and then if I touch the right side of the axis I get full right authority until I go back to the left side.
+I play tons of 'Windows' space games on Linux and never had this kind of issue.
